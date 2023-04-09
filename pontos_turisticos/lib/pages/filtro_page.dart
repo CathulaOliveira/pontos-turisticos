@@ -9,7 +9,7 @@ class FiltroPage extends StatefulWidget {
   static const ROUTE_NAME = '/filtro';
   static const CHAVE_CAMPO_ORDENACAO = 'campoOrdenacao';
   static const CHAVE_USAR_ORDEM_DECERSCENTE = 'usarOrdemDecrescente';
-  static const CHAVE_FILTRO_DESCRICAO = 'filtroDescricao';
+  static const CHAVE_FILTRO_NOME = 'filtroNome';
   static const CHAVE_FILTRO_DATA = 'filtroData';
 
   @override
@@ -20,13 +20,13 @@ class _FiltroPageState extends State<FiltroPage> {
 
   final _camposParaOrdenacao = {
     PontoTuristico.CAMPO_ID: 'Código',
-    PontoTuristico.CAMPO_DESCRICAO: 'Descrição',
+    PontoTuristico.CAMPO_NOME: 'Nome',
     PontoTuristico.CAMPO_DATA: 'Data'
   };
 
   late final SharedPreferences pref;
 
-  final descricaoController = TextEditingController();
+  final nomeController = TextEditingController();
   final dataController = TextEditingController();
   final _dateFormat = DateFormat('dd/MM/yyyy');
 
@@ -82,8 +82,8 @@ class _FiltroPageState extends State<FiltroPage> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 10),
           child: TextField(
-            decoration: InputDecoration(labelText: 'Descrição começa com:'),
-            controller: descricaoController,
+            decoration: InputDecoration(labelText: 'Nome começa com:'),
+            controller: nomeController,
             onChanged: _onFiltroDescricaoChange,
           ),
         ),
@@ -121,8 +121,8 @@ class _FiltroPageState extends State<FiltroPage> {
     setState(() {
       campoOrdenacao = pref.getString(FiltroPage.CHAVE_CAMPO_ORDENACAO) ?? PontoTuristico.CAMPO_ID;
       usarOrdemDecrescente = pref.getBool(FiltroPage.CHAVE_USAR_ORDEM_DECERSCENTE) ?? false;
-      descricaoController.text = pref.getString(FiltroPage.CHAVE_FILTRO_DESCRICAO) ?? '';
-      descricaoController.text = pref.getString(FiltroPage.CHAVE_FILTRO_DATA) ?? '';
+      nomeController.text = pref.getString(FiltroPage.CHAVE_FILTRO_NOME) ?? '';
+      dataController.text = pref.getString(FiltroPage.CHAVE_FILTRO_DATA) ?? '';
     });
   }
 
@@ -164,7 +164,7 @@ class _FiltroPageState extends State<FiltroPage> {
   }
 
   void _onFiltroDescricaoChange(String? valor) {
-    pref.setString(FiltroPage.CHAVE_FILTRO_DESCRICAO, valor ?? '');
+    pref.setString(FiltroPage.CHAVE_FILTRO_NOME, valor ?? '');
     _alterouValores = true;
   }
 

@@ -15,6 +15,7 @@ class ConteudoFormDialog extends StatefulWidget {
 
 class ConteudoFormDialogState extends State<ConteudoFormDialog> {
   final formKey = GlobalKey<FormState>();
+  final nomeController = TextEditingController();
   final descricaoController = TextEditingController();
   final detalhesController = TextEditingController();
   final dataController = TextEditingController();
@@ -24,6 +25,7 @@ class ConteudoFormDialogState extends State<ConteudoFormDialog> {
   void initState() {
     super.initState();
     if (widget.pontoTuristico != null) {
+      nomeController.text = widget.pontoTuristico!.nome;
       descricaoController.text = widget.pontoTuristico!.descricao;
       detalhesController.text = widget.pontoTuristico!.detalhes;
       dataController.text = widget.pontoTuristico!.dataFormatado;
@@ -38,6 +40,16 @@ class ConteudoFormDialogState extends State<ConteudoFormDialog> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          TextFormField(
+            controller: nomeController,
+            decoration: InputDecoration(labelText: 'Nome'),
+            validator: (String? valor){
+              if (valor == null || valor.isEmpty) {
+                return 'Informe o nome';
+              }
+              return null;
+            },
+          ),
           TextFormField(
             controller: descricaoController,
             decoration: InputDecoration(labelText: 'Descrição'),
@@ -60,6 +72,7 @@ class ConteudoFormDialogState extends State<ConteudoFormDialog> {
           ),
           TextFormField(
             controller: dataController,
+            enabled: false,
             decoration: InputDecoration(
               labelText: 'Data',
               prefixIcon: IconButton(
@@ -103,6 +116,7 @@ class ConteudoFormDialogState extends State<ConteudoFormDialog> {
 
   PontoTuristico get pontoTuristico => PontoTuristico(
     id: widget.pontoTuristico?.id ?? 0,
+    nome: nomeController.text,
     descricao: descricaoController.text,
     data: dataController.text.isEmpty ? null : _dateFormat.parse(dataController.text),
     detalhes: detalhesController.text,

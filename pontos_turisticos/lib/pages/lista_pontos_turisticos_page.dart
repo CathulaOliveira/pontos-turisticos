@@ -56,7 +56,7 @@ class _ListaPontosTuristicosPageState extends State<ListaPontosTuristicosPage> {
 
         return PopupMenuButton<String>(
           child: ListTile(
-            title: Text('${pontoTuristico.id} - ${pontoTuristico.descricao}'),
+            title: Text('${pontoTuristico.id} - ${pontoTuristico.nome}'),
           ),
           itemBuilder: (BuildContext context) => criarItensMenuPopup(),
           onSelected: (String valorSelecionado) {
