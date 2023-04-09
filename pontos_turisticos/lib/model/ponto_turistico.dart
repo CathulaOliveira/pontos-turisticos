@@ -9,17 +9,23 @@ class PontoTuristico {
   static const CAMPO_DETALHES = 'detalhes';
   static const NOME_TABLE = 'ponto_turistico';
 
-  int id;
+  int? id;
   String nome;
   String descricao;
   String detalhes;
   DateTime? data;
 
-  PontoTuristico({required this.id, required this.nome, required this.descricao, this.data, required this.detalhes});
+  PontoTuristico({
+    this.id,
+    required this.nome,
+    required this.descricao,
+    this.data,
+    required this.detalhes,
+  });
 
   String get dataFormatado {
     if (data == null) {
-      return "";
+      return '';
     }
     return DateFormat('dd/MM/yyyy').format(data!);
   }

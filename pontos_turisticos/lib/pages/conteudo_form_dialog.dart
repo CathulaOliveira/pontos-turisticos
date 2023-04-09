@@ -115,7 +115,7 @@ class ConteudoFormDialogState extends State<ConteudoFormDialog> {
   bool dadosValidados() => formKey.currentState!.validate() == true;
 
   PontoTuristico get pontoTuristico => PontoTuristico(
-    id: widget.pontoTuristico?.id ?? 0,
+    id: widget.pontoTuristico?.id,
     nome: nomeController.text,
     descricao: descricaoController.text,
     data: dataController.text.isEmpty ? null : _dateFormat.parse(dataController.text),

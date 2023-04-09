@@ -118,7 +118,7 @@ class _ListaPontosTuristicosPageState extends State<ListaPontosTuristicosPage> {
     final navigator = Navigator.of(context);
     navigator.pushNamed(FiltroPage.ROUTE_NAME).then((alterouValores) {
       if (alterouValores == true) {
-
+        _atualizaDados();
       }
     });
   }
@@ -172,9 +172,12 @@ class _ListaPontosTuristicosPageState extends State<ListaPontosTuristicosPage> {
     final campoOrdenacao = prefs.getString(FiltroPage.CHAVE_CAMPO_ORDENACAO) ?? PontoTuristico.CAMPO_ID;
     final usarOrdemDecrescente = prefs.getBool(FiltroPage.CHAVE_USAR_ORDEM_DECERSCENTE) == true;
     final filtroNome = prefs.getString(FiltroPage.CHAVE_FILTRO_NOME) ?? '';
+    final filtroDetalhe = prefs.getString(FiltroPage.CHAVE_FILTRO_DETALHE) ?? '';
     final filtroData = prefs.getString(FiltroPage.CHAVE_FILTRO_DATA) ?? '';
     final pontosTuristicosListar = await _dao.listar(
-        filtro: filtroNome,
+        filtroNome: filtroNome,
+        filtroDetalhe: filtroDetalhe,
+        filtroData: filtroData,
         usarOrdemDecrescente: usarOrdemDecrescente,
         campoOrdenacao: campoOrdenacao
     );
@@ -250,7 +253,7 @@ class _ListaPontosTuristicosPageState extends State<ListaPontosTuristicosPage> {
                   if (pontoTuristico.id == null) {
                     return;
                   }
-                  _dao.excluir(pontoTuristico.id).then((value) {
+                  _dao.excluir(pontoTuristico.id!).then((value) {
                     if (value) {
                       _atualizaDados();
                     }

@@ -36,30 +36,45 @@ class PontoTuristicoDao {
 
 
   Future<List<PontoTuristico>> listar(
-      {String filtro = '',
+      {String filtroNome = '',
+        String filtroDetalhe = '',
+        String filtroData = '',
         String campoOrdenacao = PontoTuristico.CAMPO_ID,
         bool usarOrdemDecrescente = false
       }) async {
-    String? where;
-    if (filtro.isNotEmpty) {
-      where = "UPPER(${PontoTuristico.CAMPO_NOME}) LIKE '${filtro.toUpperCase()}%'";
+    String where = '';
+    if (filtroNome.isNotEmpty) {
+      where = "UPPER(${PontoTuristico.CAMPO_NOME}) LIKE '${filtroNome.toUpperCase()}%'";
+    }
+    if (filtroDetalhe.isNotEmpty) {
+      if (where.isNotEmpty) {
+        where += " AND ";
+      }
+      where += "UPPER(${PontoTuristico.CAMPO_DETALHES}) LIKE '%${filtroDetalhe.toUpperCase()}%'";
+    }
+    if (filtroData.isNotEmpty) {
+      if (where.isNotEmpty) {
+        where += " AND ";
+      }
+      where += "UPPER(${PontoTuristico.CAMPO_DATA}) LIKE '${filtroData.toUpperCase()}%'";
     }
     var orderBy = campoOrdenacao;
     if (usarOrdemDecrescente) {
       orderBy += ' DESC';
     }
     final db = await dbProvider.database;
-    final resultado = await db.query(
-        PontoTuristico.NOME_TABLE,
-        columns: [PontoTuristico.CAMPO_ID,
-          PontoTuristico.CAMPO_NOME,
-          PontoTuristico.CAMPO_DESCRICAO,
-          PontoTuristico.CAMPO_DATA,
-          PontoTuristico.CAMPO_DETALHES
-        ],
-      where: where,
-      orderBy: orderBy
-    );
+    final query = '''
+      SELECT
+        ${PontoTuristico.CAMPO_ID},
+        ${PontoTuristico.CAMPO_NOME},
+        ${PontoTuristico.CAMPO_DESCRICAO},
+        ${PontoTuristico.CAMPO_DATA},
+        ${PontoTuristico.CAMPO_DETALHES}
+        FROM ${PontoTuristico.NOME_TABLE}
+        ${where.isNotEmpty ? ' WHERE $where' : ''}
+        ORDER BY $orderBy
+    ''';
+    final resultado = await db.rawQuery(query);
     return resultado.map((m) => PontoTuristico.fromMap(m)).toList();
   }
 }

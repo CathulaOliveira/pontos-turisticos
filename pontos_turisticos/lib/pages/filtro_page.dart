@@ -10,6 +10,7 @@ class FiltroPage extends StatefulWidget {
   static const CHAVE_CAMPO_ORDENACAO = 'campoOrdenacao';
   static const CHAVE_USAR_ORDEM_DECERSCENTE = 'usarOrdemDecrescente';
   static const CHAVE_FILTRO_NOME = 'filtroNome';
+  static const CHAVE_FILTRO_DETALHE = 'filtroDetalhe';
   static const CHAVE_FILTRO_DATA = 'filtroData';
 
   @override
@@ -27,6 +28,7 @@ class _FiltroPageState extends State<FiltroPage> {
   late final SharedPreferences pref;
 
   final nomeController = TextEditingController();
+  final detalheController = TextEditingController();
   final dataController = TextEditingController();
   final _dateFormat = DateFormat('dd/MM/yyyy');
 
@@ -34,10 +36,14 @@ class _FiltroPageState extends State<FiltroPage> {
   bool usarOrdemDecrescente = false;
   bool _alterouValores = false;
 
+
   @override
   void initState() {
     super.initState();
     _carregarSharedPreferences();
+    dataController.addListener(() {
+      _onFiltroDataChange();
+    });
   }
 
   Widget build (BuildContext context) {
@@ -84,7 +90,16 @@ class _FiltroPageState extends State<FiltroPage> {
           child: TextField(
             decoration: InputDecoration(labelText: 'Nome começa com:'),
             controller: nomeController,
-            onChanged: _onFiltroDescricaoChange,
+            onChanged: _onFiltroNomeChange,
+          ),
+        ),
+        Divider(),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: TextField(
+            decoration: InputDecoration(labelText: 'Detalhe contem:'),
+            controller: detalheController,
+            onChanged: _onFiltroDetalheChange,
           ),
         ),
         Divider(),
@@ -103,7 +118,6 @@ class _FiltroPageState extends State<FiltroPage> {
               ),
             ),
             controller: dataController,
-            onChanged: _onFiltroDataChange,
           ),
         ),
       ],
@@ -122,6 +136,7 @@ class _FiltroPageState extends State<FiltroPage> {
       campoOrdenacao = pref.getString(FiltroPage.CHAVE_CAMPO_ORDENACAO) ?? PontoTuristico.CAMPO_ID;
       usarOrdemDecrescente = pref.getBool(FiltroPage.CHAVE_USAR_ORDEM_DECERSCENTE) ?? false;
       nomeController.text = pref.getString(FiltroPage.CHAVE_FILTRO_NOME) ?? '';
+      detalheController.text = pref.getString(FiltroPage.CHAVE_FILTRO_DETALHE) ?? '';
       dataController.text = pref.getString(FiltroPage.CHAVE_FILTRO_DATA) ?? '';
     });
   }
@@ -163,13 +178,19 @@ class _FiltroPageState extends State<FiltroPage> {
     });
   }
 
-  void _onFiltroDescricaoChange(String? valor) {
+  void _onFiltroNomeChange(String? valor) {
     pref.setString(FiltroPage.CHAVE_FILTRO_NOME, valor ?? '');
     _alterouValores = true;
   }
 
-  void _onFiltroDataChange(String? valor) {
-    pref.setString(FiltroPage.CHAVE_FILTRO_DATA, valor ?? '');
+
+  void _onFiltroDetalheChange(String? valor) {
+    pref.setString(FiltroPage.CHAVE_FILTRO_DETALHE, valor ?? '');
+    _alterouValores = true;
+  }
+
+  void _onFiltroDataChange() {
+    pref.setString(FiltroPage.CHAVE_FILTRO_DATA, dataController.text ?? '');
     _alterouValores = true;
   }
 }
