@@ -34,7 +34,6 @@ class PontoTuristicoDao {
     return registrosAtualizados > 0;
   }
 
-
   Future<List<PontoTuristico>> listar(
       {String filtroNome = '',
         String filtroDetalhe = '',
@@ -69,7 +68,9 @@ class PontoTuristicoDao {
         ${PontoTuristico.CAMPO_NOME},
         ${PontoTuristico.CAMPO_DESCRICAO},
         ${PontoTuristico.CAMPO_DATA},
-        ${PontoTuristico.CAMPO_DETALHES}
+        ${PontoTuristico.CAMPO_DETALHES},
+        ${PontoTuristico.CAMPO_LATITUDE},
+        ${PontoTuristico.CAMPO_LONGITUDE}
         FROM ${PontoTuristico.NOME_TABLE}
         ${where.isNotEmpty ? ' WHERE $where' : ''}
         ORDER BY $orderBy

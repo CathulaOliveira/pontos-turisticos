@@ -4,7 +4,7 @@ import 'package:sqflite/sqflite.dart';
 class DatabaseProvider {
 
   static const _dbName = 'pontos_turisticos.db';
-  static const _dbVersion = 1;
+  static const _dbVersion = 2;
 
   DatabaseProvider._init();
 
@@ -32,13 +32,23 @@ class DatabaseProvider {
         ${PontoTuristico.CAMPO_NOME} TEXT NOT NULL,
         ${PontoTuristico.CAMPO_DESCRICAO} TEXT NOT NULL,
         ${PontoTuristico.CAMPO_DATA} TEXT,
-        ${PontoTuristico.CAMPO_DETALHES} TEXT
+        ${PontoTuristico.CAMPO_DETALHES} TEXT,
+        ${PontoTuristico.CAMPO_LATITUDE} DOUBLE,
+        ${PontoTuristico.CAMPO_LONGITUDE} DOUBLE
       );
     ''');
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-
+    switch(newVersion){
+      case 2:
+        await db.execute('''
+          ALTER TABLE ${PontoTuristico.NOME_TABLE} ADD ${PontoTuristico.CAMPO_LATITUDE} DOUBLE;
+        ''');
+        await db.execute('''
+          ALTER TABLE ${PontoTuristico.NOME_TABLE} ADD ${PontoTuristico.CAMPO_LONGITUDE} DOUBLE;
+        ''');
+    }
   }
 
   Future<void> close() async {

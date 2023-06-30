@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:pontos_turisticos/dao/ponto_turistico_dao.dart';
 import 'package:pontos_turisticos/pages/conteudo_form_dialog.dart';
 import 'package:pontos_turisticos/pages/datalhes_ponto_turistico_page.dart';
@@ -22,10 +24,12 @@ class _ListaPontosTuristicosPageState extends State<ListaPontosTuristicosPage> {
   final pontosTuristicos = <PontoTuristico>[];
   final _dao = PontoTuristicoDao();
   var carregando = false;
+  var locationServiceEnabled = false;
 
   @override
   void initState() {
     super.initState();
+    _permissoesPermitidas();
     _atualizaDados();
   }
 
@@ -265,5 +269,93 @@ class _ListaPontosTuristicosPageState extends State<ListaPontosTuristicosPage> {
           );
         }
     );
+  }
+
+  void abrirLocalizacaoNoMapa(double latitude, double longitude) {
+    MapsLauncher.launchCoordinates(latitude, longitude);
+  }
+
+  void _obterLocalizacaoAtual(PontoTuristico pontoTuristico) async {
+    bool servicoHabilitado = await _servicoHabilitado();
+    if(!servicoHabilitado){
+      return;
+    }
+    bool permissoesPermitidas = await _permissoesPermitidas();
+    if(!permissoesPermitidas){
+      return;
+    }
+    Position position = await Geolocator.getCurrentPosition();
+    setState(() {
+      pontoTuristico.latitude = position.latitude;
+      pontoTuristico.longitude = position.longitude;
+    });
+  }
+
+  Future<bool> _servicoHabilitado() async {
+    bool servicoHabilitado = await Geolocator.isLocationServiceEnabled();
+    if (!servicoHabilitado){
+      await _mostrarDialogMensagem('Para utilizar esse recurso, você deverá habilitar o serviço'
+          ' de localização');
+      Geolocator.openLocationSettings();
+      return false;
+    }
+    return true;
+  }
+
+  Future<bool> _permissoesPermitidas() async {
+    LocationPermission permissao = await Geolocator.checkPermission();
+    if(permissao == LocationPermission.denied){
+      permissao = await Geolocator.requestPermission();
+      if(permissao == LocationPermission.denied){
+        _mostrarMensagem('Não será possível utilizar o recurso '
+            'por falta de permissão');
+      }
+    }
+    if(permissao == LocationPermission.deniedForever){
+      await _mostrarDialogMensagem('Para utilizar esse recurso, você deverá acessar '
+          'as configurações do app para permitir a utilização do serviço de localização');
+      Geolocator.openAppSettings();
+      return false;
+    }
+    return true;
+  }
+
+  void _mostrarMensagem(String mensagem){
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensagem)));
+  }
+
+  Future<void> _mostrarDialogMensagem(String mensagem) async {
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Atenção'),
+        content: Text(mensagem),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK')
+          )
+        ],
+      ),
+    );
+  }
+
+  _verificarLocalizacao(PontoTuristico pontoTuristico) async {
+    if (pontoTuristico.latitude != null && pontoTuristico.longitude != null) {
+      await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text('Atenção'),
+          content: Text('Verifique se a Localição esta correta'),
+          actions: [
+            TextButton(
+                onPressed: () => abrirLocalizacaoNoMapa(pontoTuristico.latitude!, pontoTuristico.longitude!),
+                child: Text('OK')
+            )
+          ],
+        ),
+      );
+    }
+
   }
 }

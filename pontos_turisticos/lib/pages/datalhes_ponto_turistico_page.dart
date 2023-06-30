@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:pontos_turisticos/model/ponto_turistico.dart';
 
 
@@ -58,9 +59,31 @@ class _DetalhesPontoTuristicoPageState extends State<DetalhesPontoTuristicoPage>
               Valor(valor: '${widget.pontoTuristico.data}'),
             ],
           ),
+          Row(
+            children: [
+              Campo(descricao:'Latitude: '),
+              Valor(valor: '${widget.pontoTuristico.latitude}'),
+            ],
+          ),
+          Row(
+            children: [
+              Campo(descricao:'Longitude: '),
+              Valor(valor: '${widget.pontoTuristico.longitude}'),
+            ],
+          ),
+          TextButton(
+              onPressed: () => _abrirMapa(widget.pontoTuristico.latitude, widget.pontoTuristico.longitude),
+              child: Text('Visualizar no mapa')
+          ),
         ],
       ),
     );
+  }
+
+  void _abrirMapa(double? latitude, double? longitude) {
+    if (latitude != null && longitude != null) {
+      MapsLauncher.launchCoordinates(latitude, longitude);
+    }
   }
 }
 
